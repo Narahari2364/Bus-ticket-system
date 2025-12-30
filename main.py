@@ -1,5 +1,6 @@
 from file_handler import load_ticket_data, get_unique_categories, load_ticket_objects, save_purchase, load_purchases
 from ticket_classes import Purchase
+from collections import Counter
 
 def display_menu():
     """
@@ -19,7 +20,8 @@ def display_menu():
     print("2. Search Top-ups")
     print("3. Purchase Ticket")
     print("4. View My Purchases")
-    print("5. Exit")
+    print("5. View Purchase Statistics")
+    print("6. Exit")
     print("="*40)
 
 def view_categories_v2(categories):
@@ -238,6 +240,63 @@ def view_my_purchases():
     print("\n" + "="*40)
     print(f"Total spent: £{total_spent:.2f}")
     print("="*40)
+    
+    # Offer to view statistics
+    try:
+        view_stats = input("\nView purchase statistics? (yes/no): ").lower()
+        if view_stats in ['yes', 'y']:
+            view_purchase_stats()
+    except Exception:
+        pass  # Silently continue if user cancels
+
+def view_purchase_stats():
+    """
+    Show simple bar chart of category purchases.
+    
+    Analyzes purchase history and displays a text-based bar chart
+    showing the distribution of purchases by category. Uses Unicode
+    block characters to create a visual representation.
+    
+    Returns:
+        None
+    """
+    purchases = load_purchases()
+    
+    if not purchases:
+        print("No purchase data to analyze.")
+        return
+    
+    # Count purchases by category
+    category_counts = Counter()
+    
+    for purchase_line in purchases:
+        try:
+            purchase_dict = Purchase.from_file_format(purchase_line)
+            category_counts[purchase_dict['category']] += 1
+        except Exception:
+            continue  # Skip invalid purchases
+    
+    if not category_counts:
+        print("No valid purchase data to analyze.")
+        return
+    
+    # Display simple text bar chart
+    print("\n" + "="*40)
+    print("   PURCHASES BY CATEGORY")
+    print("="*40)
+    
+    max_count = max(category_counts.values()) if category_counts else 1
+    
+    # Sort by count (descending) for better visualization
+    sorted_categories = sorted(category_counts.items(), key=lambda x: x[1], reverse=True)
+    
+    for category, count in sorted_categories:
+        bar_length = int((count / max_count) * 30)
+        bar = "█" * bar_length
+        print(f"{category:20} {bar} ({count})")
+    
+    print("="*40)
+    print(f"Total purchases: {sum(category_counts.values())}")
 
 def main():
     """
@@ -267,7 +326,7 @@ def main():
         display_menu()
         
         try:
-            choice = input("\nEnter your choice (1-5): ")
+            choice = input("\nEnter your choice (1-6): ")
             
             if choice == "1":
                 view_categories_v2(categories)
@@ -278,10 +337,12 @@ def main():
             elif choice == "4":
                 view_my_purchases()
             elif choice == "5":
+                view_purchase_stats()
+            elif choice == "6":
                 print("Thank you for using Bus Ticket System!")
                 break
             else:
-                print("Invalid choice! Please enter 1-5.")
+                print("Invalid choice! Please enter 1-6.")
                 
         except KeyboardInterrupt:
             print("\nProgram interrupted. Goodbye!")
