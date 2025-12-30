@@ -22,5 +22,43 @@ Create a Python program to help users browse and purchase bus tickets.
 - ✅ View categories feature working
 - ✅ Category details display working
 
+### Week 3 Progress
+- ✅ Designed class structure
+- ✅ Implemented Ticket class
+- ✅ Implemented Category class
+- ✅ Refactored code to use objects
+- ✅ All features still working
+
+## Class Design
+
+### Category Class
+**Attributes:**
+- name (string)
+- tickets (list of Ticket objects)
+
+**Methods:**
+- __init__(name)
+- add_ticket(ticket)
+- get_all_tickets()
+- display_info()
+
+### Ticket Class
+**Attributes:**
+- category (string)
+- topup_type (string)
+- price (float)
+- duration (string)
+- entitlement_type (string)
+
+**Methods:**
+- __init__(data_dict)
+- display_info()
+- get_price()
+
 ### CSV Structure
-*Note: Add CSV file to `data/bus_tickets.csv` to test. The CSV structure will be documented here once the file is added.*
+The CSV contains the following fields:
+- category_id, category_title, category_description
+- topup_id, topup_title, topup_description, topup_price_in_pence
+- topup_entitlement_type, topup_entitlement_unit, topup_entitlement_value, topup_entitlement_quantity
+- topup_entitlement_start_date, topup_entitlement_end_date
+- topup_passenger_class_id, topup_passenger_class_name, topup_passenger_class_quantity
