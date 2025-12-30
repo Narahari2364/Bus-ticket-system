@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Ticket:
     """Represents a single bus ticket/top-up option"""
     
@@ -86,6 +88,56 @@ class Category:
         return f"{self.name} ({self.get_ticket_count()} tickets)"
 
 
+class Purchase:
+    """Represents a ticket purchase"""
+    
+    def __init__(self, ticket, quantity=1):
+        """
+        Initialize purchase
+        ticket: Ticket object
+        quantity: number of tickets
+        """
+        self.ticket = ticket
+        self.quantity = quantity
+        self.timestamp = datetime.now()
+        self.total = ticket.get_price() * quantity
+    
+    def get_total(self):
+        """Return total cost"""
+        return self.total
+    
+    def display_receipt(self):
+        """Display purchase receipt"""
+        print("\n" + "="*40)
+        print("   PURCHASE RECEIPT")
+        print("="*40)
+        print(f"Date: {self.timestamp.strftime('%Y-%m-%d %H:%M')}")
+        print(f"Ticket: {self.ticket.topup_type}")
+        print(f"Category: {self.ticket.category}")
+        print(f"Unit Price: £{self.ticket.get_price():.2f}")
+        print(f"Quantity: {self.quantity}")
+        print(f"Total: £{self.total:.2f}")
+        print("="*40)
+    
+    def to_file_format(self):
+        """Convert purchase to string for saving to file"""
+        return f"{self.timestamp}|{self.ticket.category}|{self.ticket.topup_type}|{self.quantity}|{self.total}"
+    
+    @staticmethod
+    def from_file_format(line):
+        """Create Purchase from saved file line"""
+        # This is for loading purchases later
+        parts = line.strip().split('|')
+        # Return dictionary with purchase info
+        return {
+            'timestamp': parts[0],
+            'category': parts[1],
+            'topup_type': parts[2],
+            'quantity': parts[3],
+            'total': parts[4]
+        }
+
+
 # Test code
 if __name__ == "__main__":
     # Test Ticket class
@@ -108,4 +160,12 @@ if __name__ == "__main__":
     category = Category("Adult")
     category.add_ticket(ticket)
     category.display_info()
+    
+    # Test Purchase class
+    print("\n" + "="*50)
+    print("Testing Purchase class:")
+    print("="*50)
+    purchase = Purchase(ticket, quantity=2)
+    purchase.display_receipt()
+    print(f"\nFile format: {purchase.to_file_format()}")
 
