@@ -7,8 +7,8 @@ Create a Python program to help users browse and purchase bus tickets.
 - [x] Read ticket data from CSV
 - [x] Display menu system
 - [x] Browse categories
-- [ ] Purchase tickets
-- [ ] Save purchases to file
+- [x] Purchase tickets
+- [x] Save purchases to file
 
 ## Development Log
 ### Week 1
@@ -28,6 +28,13 @@ Create a Python program to help users browse and purchase bus tickets.
 - ✅ Implemented Category class
 - ✅ Refactored code to use objects
 - ✅ All features still working
+
+### Week 4 Progress
+- ✅ Created Purchase class
+- ✅ Implemented purchase flow
+- ✅ Save purchases to file
+- ✅ View purchase history
+- ✅ Receipt generation
 
 ## Class Design
 
@@ -54,6 +61,20 @@ Create a Python program to help users browse and purchase bus tickets.
 - __init__(data_dict)
 - display_info()
 - get_price()
+
+### Purchase Class
+**Attributes:**
+- ticket (Ticket object)
+- quantity (int)
+- timestamp (datetime)
+- total (float)
+
+**Methods:**
+- __init__(ticket, quantity)
+- get_total()
+- display_receipt()
+- to_file_format()
+- from_file_format(line) [static method]
 
 ### CSV Structure
 The CSV contains the following fields:
