@@ -1,25 +1,72 @@
 import csv
+import os
 from ticket_classes import Ticket, Category
 
 def load_ticket_data(filename):
     """
     Load ticket data from CSV file.
-    Returns: list of dictionaries, or empty list if error
+    
+    Reads a CSV file and converts each row into a dictionary.
+    Provides detailed error messages for common issues like missing files,
+    permission errors, and invalid CSV format.
+    
+    Args:
+        filename (str): Path to the CSV file to load
+        
+    Returns:
+        list: List of dictionaries, one per row, or empty list if error
+        
+    Raises:
+        FileNotFoundError: If the file doesn't exist
+        PermissionError: If file cannot be read due to permissions
+        csv.Error: If CSV format is invalid
     """
     ticket_data = []
+    
+    if not os.path.exists(filename):
+        print("="*50)
+        print("ERROR: Ticket data file not found!")
+        print(f"Looking for: {filename}")
+        print("\nPlease ensure:")
+        print("1. The CSV file is downloaded from NOW")
+        print("2. It's placed in the 'data' folder")
+        print("3. The filename matches exactly")
+        print("="*50)
+        return []
     
     try:
         with open(filename, 'r') as file:
             reader = csv.DictReader(file)
             ticket_data = list(reader)
-            print(f"Successfully loaded {len(ticket_data)} tickets")
             
+            if not ticket_data:
+                print("Warning: CSV file is empty!")
+            else:
+                print(f"Successfully loaded {len(ticket_data)} tickets")
+                
+    except PermissionError:
+        print("="*50)
+        print("Error: No permission to read file!")
+        print(f"File: {filename}")
+        print("Please check file permissions.")
+        print("="*50)
+        return []
+        
+    except csv.Error as e:
+        print("="*50)
+        print(f"Error: Invalid CSV format - {e}")
+        print("Please ensure the CSV file is properly formatted.")
+        print("="*50)
+        return []
+        
     except FileNotFoundError:
         print(f"Error: File '{filename}' not found!")
         print("Please ensure the CSV file is in the data folder.")
+        return []
         
     except Exception as e:
-        print(f"Error loading data: {e}")
+        print(f"Unexpected error: {e}")
+        return []
     
     return ticket_data
 
@@ -27,7 +74,16 @@ def load_ticket_data(filename):
 def get_unique_categories(ticket_data):
     """
     Extract unique category names from ticket data.
-    Returns: list of unique categories
+    
+    Iterates through ticket data dictionaries and collects unique
+    category names using a set to avoid duplicates. Returns a
+    sorted list for consistent ordering.
+    
+    Args:
+        ticket_data (list): List of dictionaries containing ticket data
+        
+    Returns:
+        list: Sorted list of unique category names (strings)
     """
     categories = set()  # Use set to avoid duplicates
     
@@ -40,7 +96,18 @@ def get_unique_categories(ticket_data):
 
 def save_purchase(purchase_data, filename='data/purchases.txt'):
     """
-    Save a purchase to file.
+    Save a purchase record to a file.
+    
+    Appends a purchase record (as a string) to the purchases file.
+    Creates the file if it doesn't exist. Uses append mode to preserve
+    existing purchases.
+    
+    Args:
+        purchase_data (str): String representation of the purchase to save
+        filename (str, optional): Path to the purchases file. Defaults to 'data/purchases.txt'.
+        
+    Returns:
+        bool: True if save was successful, False otherwise
     """
     try:
         with open(filename, 'a') as file:  # 'a' for append
@@ -55,7 +122,15 @@ def save_purchase(purchase_data, filename='data/purchases.txt'):
 def load_purchases(filename='data/purchases.txt'):
     """
     Load previous purchases from file.
-    Returns: list of purchases
+    
+    Reads all purchase records from the purchases file, one per line.
+    Returns an empty list if the file doesn't exist (no previous purchases).
+    
+    Args:
+        filename (str, optional): Path to the purchases file. Defaults to 'data/purchases.txt'.
+        
+    Returns:
+        list: List of strings, each representing a purchase record, or empty list if no file
     """
     purchases = []
     
@@ -75,8 +150,18 @@ def load_purchases(filename='data/purchases.txt'):
 
 def load_ticket_objects(filename):
     """
-    Load ticket data and return as Ticket objects organized by Category
-    Returns: dictionary {category_name: Category object}
+    Load ticket data and return as Ticket objects organized by Category.
+    
+    Reads CSV file, creates Ticket objects for each row, and organizes
+    them into Category objects. Returns a dictionary where keys are
+    category names and values are Category objects containing their tickets.
+    
+    Args:
+        filename (str): Path to the CSV file containing ticket data
+        
+    Returns:
+        dict: Dictionary mapping category names (str) to Category objects,
+              or empty dict if error
     """
     categories = {}
     
