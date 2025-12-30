@@ -2,7 +2,16 @@ from file_handler import load_ticket_data, get_unique_categories, load_ticket_ob
 from ticket_classes import Purchase
 
 def display_menu():
-    """Display main menu options"""
+    """
+    Display the main menu options to the user.
+    
+    Shows all available menu options (1-5) with clear formatting.
+    Menu options include viewing categories, searching, purchasing,
+    viewing purchases, and exiting the program.
+    
+    Returns:
+        None
+    """
     print("\n" + "="*40)
     print("   BUS TICKET PURCHASE SYSTEM")
     print("="*40)
@@ -14,7 +23,19 @@ def display_menu():
     print("="*40)
 
 def view_categories_v2(categories):
-    """Display categories using Category objects"""
+    """
+    Display all available ticket categories using Category objects.
+    
+    Shows a numbered list of all categories and allows the user to
+    select a category to view detailed ticket information. Uses the
+    Category object's __str__ and display_info methods.
+    
+    Args:
+        categories (dict): Dictionary of Category objects to display
+        
+    Returns:
+        None
+    """
     if not categories:
         print("No categories available.")
         return
@@ -44,8 +65,72 @@ def view_categories_v2(categories):
     except ValueError:
         print("Please enter a valid number!")
 
+def search_tickets(categories):
+    """
+    Search for tickets by name or category.
+    
+    Searches through all categories and tickets to find matches
+    based on partial string matching in ticket type or category name.
+    Displays all matching results with their details.
+    
+    Args:
+        categories (dict): Dictionary of Category objects to search through
+        
+    Returns:
+        None
+    """
+    search_term = input("\nEnter search term: ").lower()
+    
+    if not search_term.strip():
+        print("Search term cannot be empty!")
+        return
+    
+    results = []
+    
+    # Search through all categories
+    for category in categories.values():
+        for ticket in category.get_all_tickets():
+            # Check if search term in ticket type or category
+            if (search_term in ticket.topup_type.lower() or 
+                search_term in ticket.category.lower()):
+                results.append((category.name, ticket))
+    
+    if not results:
+        print(f"\nNo tickets found matching '{search_term}'")
+        return
+    
+    print(f"\nFound {len(results)} results:")
+    print("="*40)
+    
+    for i, (cat_name, ticket) in enumerate(results, 1):
+        print(f"\n{i}. {cat_name} - {ticket.topup_type}")
+        print(f"   Price: £{ticket.get_price():.2f}")
+        if hasattr(ticket, 'topup_description') and ticket.topup_description:
+            print(f"   Description: {ticket.topup_description[:50]}...")
+
 def purchase_ticket(categories):
-    """Handle ticket purchase process"""
+    """
+    Handle the complete ticket purchase process.
+    
+    Guides the user through a multi-step purchase flow:
+    1. Select a category from available categories
+    2. Select a specific ticket from the chosen category
+    3. Enter the quantity of tickets to purchase
+    4. Confirm the purchase before finalizing
+    
+    Creates a Purchase object and saves it to file upon confirmation.
+    Displays a receipt after successful purchase.
+    
+    Args:
+        categories (dict): Dictionary of Category objects containing tickets
+        
+    Returns:
+        None
+        
+    Raises:
+        ValueError: If user enters invalid numeric input
+        Exception: For any other unexpected errors during purchase
+    """
     print("\n" + "="*40)
     print("   PURCHASE TICKET")
     print("="*40)
@@ -114,7 +199,16 @@ def purchase_ticket(categories):
         print(f"Error during purchase: {e}")
 
 def view_my_purchases():
-    """Display all previous purchases"""
+    """
+    Display all previous purchases from purchase history file.
+    
+    Loads all saved purchases from the purchases file, displays them
+    in a formatted list with details (date, ticket type, quantity, total),
+    and calculates the total amount spent across all purchases.
+    
+    Returns:
+        None
+    """
     purchases = load_purchases()
     
     if not purchases:
@@ -146,7 +240,22 @@ def view_my_purchases():
     print("="*40)
 
 def main():
-    """Main program loop"""
+    """
+    Main program entry point.
+    
+    Loads ticket data, displays menu, and handles user choices
+    in a loop until user exits. Manages the overall program flow
+    and routes user selections to appropriate functions.
+    
+    Handles:
+    - Menu display
+    - User input validation
+    - Feature routing (view categories, search, purchase, view history)
+    - Graceful exit on option 5 or Ctrl+C
+    
+    Returns:
+        None
+    """
     # Load ticket data as objects organized by category
     categories = load_ticket_objects('data/bus_tickets.csv')
     
@@ -163,7 +272,7 @@ def main():
             if choice == "1":
                 view_categories_v2(categories)
             elif choice == "2":
-                print("Search top-ups - Coming soon!")
+                search_tickets(categories)
             elif choice == "3":
                 purchase_ticket(categories)
             elif choice == "4":
