@@ -1,4 +1,5 @@
-from file_handler import load_ticket_data, get_unique_categories, load_ticket_objects
+from file_handler import load_ticket_data, get_unique_categories, load_ticket_objects, save_purchase, load_purchases
+from ticket_classes import Purchase
 
 def display_menu():
     """Display main menu options"""
@@ -43,6 +44,107 @@ def view_categories_v2(categories):
     except ValueError:
         print("Please enter a valid number!")
 
+def purchase_ticket(categories):
+    """Handle ticket purchase process"""
+    print("\n" + "="*40)
+    print("   PURCHASE TICKET")
+    print("="*40)
+    
+    # Step 1: Select category
+    cat_list = list(categories.values())
+    
+    print("\nAvailable Categories:")
+    for i, cat in enumerate(cat_list, 1):
+        print(f"{i}. {cat.name}")
+    
+    try:
+        cat_choice = int(input("\nSelect category number: ")) - 1
+        
+        if not (0 <= cat_choice < len(cat_list)):
+            print("Invalid category!")
+            return
+        
+        selected_category = cat_list[cat_choice]
+        
+        # Step 2: Select ticket from category
+        tickets = selected_category.get_all_tickets()
+        
+        print(f"\nTickets in {selected_category.name}:")
+        for i, ticket in enumerate(tickets, 1):
+            print(f"{i}. {ticket.topup_type} - £{ticket.get_price():.2f}")
+        
+        ticket_choice = int(input("\nSelect ticket number: ")) - 1
+        
+        if not (0 <= ticket_choice < len(tickets)):
+            print("Invalid ticket!")
+            return
+        
+        selected_ticket = tickets[ticket_choice]
+        
+        # Step 3: Enter quantity
+        quantity = int(input("Enter quantity: "))
+        
+        if quantity <= 0:
+            print("Quantity must be positive!")
+            return
+        
+        # Step 4: Confirm purchase
+        print(f"\nYou are purchasing:")
+        print(f"{quantity}x {selected_ticket.topup_type}")
+        print(f"Total: £{selected_ticket.get_price() * quantity:.2f}")
+        
+        confirm = input("\nConfirm purchase? (yes/no): ").lower()
+        
+        if confirm in ['yes', 'y']:
+            # Create purchase
+            purchase = Purchase(selected_ticket, quantity)
+            
+            # Save to file
+            if save_purchase(purchase.to_file_format()):
+                purchase.display_receipt()
+                print("\n✓ Purchase saved successfully!")
+            else:
+                print("\n✗ Error saving purchase!")
+        else:
+            print("Purchase cancelled.")
+    
+    except ValueError:
+        print("Invalid input! Please enter numbers only.")
+    except Exception as e:
+        print(f"Error during purchase: {e}")
+
+def view_my_purchases():
+    """Display all previous purchases"""
+    purchases = load_purchases()
+    
+    if not purchases:
+        print("\nNo purchases found.")
+        return
+    
+    print("\n" + "="*40)
+    print("   YOUR PURCHASE HISTORY")
+    print("="*40)
+    
+    total_spent = 0.0
+    
+    for i, purchase_line in enumerate(purchases, 1):
+        try:
+            purchase_dict = Purchase.from_file_format(purchase_line)
+            
+            print(f"\n{i}. Date: {purchase_dict['timestamp']}")
+            print(f"   Ticket: {purchase_dict['topup_type']}")
+            print(f"   Quantity: {purchase_dict['quantity']}")
+            print(f"   Total: £{purchase_dict['total']}")
+            
+            total_spent += float(purchase_dict['total'])
+            
+        except Exception as e:
+            print(f"Error reading purchase: {e}")
+    
+    print("\n" + "="*40)
+    print(f"Total spent: £{total_spent:.2f}")
+    print("="*40)
+
 def main():
     """Main program loop"""
     # Load ticket data as objects organized by category
@@ -63,9 +165,9 @@ def main():
             elif choice == "2":
                 print("Search top-ups - Coming soon!")
             elif choice == "3":
-                print("Purchase - Coming soon!")
+                purchase_ticket(categories)
             elif choice == "4":
-                print("View purchases - Coming soon!")
+                view_my_purchases()
             elif choice == "5":
                 print("Thank you for using Bus Ticket System!")
                 break
