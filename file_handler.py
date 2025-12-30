@@ -1,4 +1,5 @@
 import csv
+from ticket_classes import Ticket, Category
 
 def load_ticket_data(filename):
     """
@@ -70,6 +71,37 @@ def load_purchases(filename='data/purchases.txt'):
         print(f"Error loading purchases: {e}")
     
     return purchases
+
+
+def load_ticket_objects(filename):
+    """
+    Load ticket data and return as Ticket objects organized by Category
+    Returns: dictionary {category_name: Category object}
+    """
+    categories = {}
+    
+    try:
+        with open(filename, 'r') as file:
+            reader = csv.DictReader(file)
+            
+            for row in reader:
+                # Create Ticket object
+                ticket = Ticket(row)
+                
+                # Get or create Category
+                cat_name = ticket.category
+                if cat_name not in categories:
+                    categories[cat_name] = Category(cat_name)
+                
+                # Add ticket to category
+                categories[cat_name].add_ticket(ticket)
+        
+        print(f"Loaded {len(categories)} categories successfully")
+        
+    except Exception as e:
+        print(f"Error loading tickets: {e}")
+    
+    return categories
 
 
 # Test code

@@ -1,4 +1,4 @@
-from file_handler import load_ticket_data, get_unique_categories
+from file_handler import load_ticket_data, get_unique_categories, load_ticket_objects
 
 def display_menu():
     """Display main menu options"""
@@ -12,10 +12,8 @@ def display_menu():
     print("5. Exit")
     print("="*40)
 
-def view_categories(ticket_data):
-    """Display all available ticket categories"""
-    categories = get_unique_categories(ticket_data)
-    
+def view_categories_v2(categories):
+    """Display categories using Category objects"""
     if not categories:
         print("No categories available.")
         return
@@ -24,51 +22,33 @@ def view_categories(ticket_data):
     print("   AVAILABLE TICKET CATEGORIES")
     print("="*40)
     
-    for i, category in enumerate(categories, 1):
-        print(f"{i}. {category}")
+    cat_list = list(categories.values())
+    
+    for i, category in enumerate(cat_list, 1):
+        print(f"{i}. {category}")  # Uses __str__ method
     
     print("="*40)
     
-    # Ask if user wants details
     try:
-        choice = input("\nEnter category number for details (or press Enter to return): ")
+        choice = input("\nEnter category number for details (or Enter to return): ")
         
-        if choice.strip():  # If user entered something
+        if choice.strip():
             index = int(choice) - 1
             
-            if 0 <= index < len(categories):
-                view_category_details(ticket_data, categories[index])
+            if 0 <= index < len(cat_list):
+                cat_list[index].display_info()  # Uses display_info method
             else:
-                print("Invalid category number!")
+                print("Invalid number!")
                 
     except ValueError:
         print("Please enter a valid number!")
-    except Exception as e:
-        print(f"Error: {e}")
-
-def view_category_details(ticket_data, category_name):
-    """Show all top-ups for a specific category"""
-    print(f"\n--- Details for {category_name} ---")
-    
-    # Filter tickets for this category
-    category_tickets = [t for t in ticket_data if t.get('Category') == category_name]
-    
-    if not category_tickets:
-        print("No tickets found for this category.")
-        return
-    
-    for ticket in category_tickets:
-        print(f"\nTop-up Type: {ticket.get('TopUpType', 'N/A')}")
-        print(f"Price: £{ticket.get('Price', 'N/A')}")
-        print(f"Duration: {ticket.get('Duration', 'N/A')}")
-        print("-" * 30)
 
 def main():
     """Main program loop"""
-    # Load ticket data at startup
-    ticket_data = load_ticket_data('data/bus_tickets.csv')
+    # Load ticket data as objects organized by category
+    categories = load_ticket_objects('data/bus_tickets.csv')
     
-    if not ticket_data:
+    if not categories:
         print("Cannot run without ticket data. Exiting.")
         return
     
@@ -79,7 +59,7 @@ def main():
             choice = input("\nEnter your choice (1-5): ")
             
             if choice == "1":
-                view_categories(ticket_data)
+                view_categories_v2(categories)
             elif choice == "2":
                 print("Search top-ups - Coming soon!")
             elif choice == "3":
