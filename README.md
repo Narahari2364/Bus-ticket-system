@@ -4,8 +4,8 @@
 Create a Python program to help users browse and purchase bus tickets.
 
 ## Features to Implement
-- [ ] Read ticket data from CSV
-- [ ] Display menu system
+- [x] Read ticket data from CSV
+- [x] Display menu system
 - [ ] Browse categories
 - [ ] Purchase tickets
 - [ ] Save purchases to file
@@ -13,3 +13,8 @@ Create a Python program to help users browse and purchase bus tickets.
 ## Development Log
 ### Week 1
 - Created project structure
+- Added CSV reading test function (reads first 3 rows)
+- Created basic menu system with error handling
+
+### CSV Structure
+*Note: Add CSV file to `data/bus_tickets.csv` to test. The CSV structure will be documented here once the file is added.*
