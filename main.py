@@ -1,23 +1,4 @@
-import csv
-
-# Test reading the CSV file
-def test_read_csv():
-    """Test function to see what's in the CSV file"""
-    try:
-        with open('data/bus_tickets.csv', 'r') as file:
-            reader = csv.DictReader(file)
-            
-            # Print first 3 rows to understand structure
-            count = 0
-            for row in reader:
-                print(row)
-                count += 1
-                if count >= 3:
-                    break
-    except FileNotFoundError:
-        print("Error: CSV file not found!")
-    except Exception as e:
-        print(f"Error reading file: {e}")
+from file_handler import load_ticket_data, get_unique_categories
 
 def display_menu():
     """Display main menu options"""
@@ -31,8 +12,66 @@ def display_menu():
     print("5. Exit")
     print("="*40)
 
+def view_categories(ticket_data):
+    """Display all available ticket categories"""
+    categories = get_unique_categories(ticket_data)
+    
+    if not categories:
+        print("No categories available.")
+        return
+    
+    print("\n" + "="*40)
+    print("   AVAILABLE TICKET CATEGORIES")
+    print("="*40)
+    
+    for i, category in enumerate(categories, 1):
+        print(f"{i}. {category}")
+    
+    print("="*40)
+    
+    # Ask if user wants details
+    try:
+        choice = input("\nEnter category number for details (or press Enter to return): ")
+        
+        if choice.strip():  # If user entered something
+            index = int(choice) - 1
+            
+            if 0 <= index < len(categories):
+                view_category_details(ticket_data, categories[index])
+            else:
+                print("Invalid category number!")
+                
+    except ValueError:
+        print("Please enter a valid number!")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def view_category_details(ticket_data, category_name):
+    """Show all top-ups for a specific category"""
+    print(f"\n--- Details for {category_name} ---")
+    
+    # Filter tickets for this category
+    category_tickets = [t for t in ticket_data if t.get('Category') == category_name]
+    
+    if not category_tickets:
+        print("No tickets found for this category.")
+        return
+    
+    for ticket in category_tickets:
+        print(f"\nTop-up Type: {ticket.get('TopUpType', 'N/A')}")
+        print(f"Price: £{ticket.get('Price', 'N/A')}")
+        print(f"Duration: {ticket.get('Duration', 'N/A')}")
+        print("-" * 30)
+
 def main():
     """Main program loop"""
+    # Load ticket data at startup
+    ticket_data = load_ticket_data('data/bus_tickets.csv')
+    
+    if not ticket_data:
+        print("Cannot run without ticket data. Exiting.")
+        return
+    
     while True:
         display_menu()
         
@@ -40,7 +79,7 @@ def main():
             choice = input("\nEnter your choice (1-5): ")
             
             if choice == "1":
-                print("View categories - Coming soon!")
+                view_categories(ticket_data)
             elif choice == "2":
                 print("Search top-ups - Coming soon!")
             elif choice == "3":
@@ -61,4 +100,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
