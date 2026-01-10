@@ -19,6 +19,7 @@ make purchases, and view their purchase history.
 ✅ Save purchases to file  
 ✅ View purchase history  
 ✅ Purchase statistics visualization (bar chart)  
+✅ Admin panel with ticket management  
 ✅ Comprehensive error handling  
 ✅ Input validation  
 
@@ -31,6 +32,7 @@ make purchases, and view their purchase history.
 ```
 bus_ticket_project/
 ├── main.py                 # Main program and menu
+├── admin.py                # Admin panel and management functions
 ├── ticket_classes.py       # Ticket, Category, Purchase classes
 ├── file_handler.py         # File I/O operations
 ├── data/
@@ -301,12 +303,24 @@ The CSV contains the following fields:
 **Expected:** Total purchases count displayed correctly  
 **Result:** ✅ Pass - Total count accurate
 
+## Admin Panel Features
+The admin panel (password: `admin123`) provides:
+- View all tickets in the system
+- Add new tickets
+- Edit ticket prices
+- Delete tickets
+- View all purchases (admin view)
+- View comprehensive system statistics
+
+Access the admin panel from the main menu (option 6).
+
 ## Known Limitations
-- No admin features to modify prices
 - Text-based interface only (no GUI)
-- No user authentication
+- Simple password authentication (not encrypted)
+- No user authentication for regular users
 - No payment processing integration
 - Statistics visualization is text-based only
+- Admin changes are not saved to CSV (only in memory)
 
 ## Future Enhancements
 - Add graphical data visualization with charts (matplotlib)

@@ -9,6 +9,7 @@
 from file_handler import load_ticket_objects, save_purchase, load_purchases
 from ticket_classes import Purchase
 from collections import Counter
+from admin import admin_panel
 
 
 # ============================================================================
@@ -26,7 +27,8 @@ def display_menu():
     print("3. Purchase Ticket")
     print("4. View My Purchases")
     print("5. View Purchase Statistics")
-    print("6. Exit")
+    print("6. Admin Panel")
+    print("7. Exit")
     print("="*40)
 
 
@@ -364,7 +366,7 @@ def main():
         
         try:
             # Get user's choice
-            user_choice = input("\nEnter your choice (1-6): ")
+            user_choice = input("\nEnter your choice (1-7): ")
             
             # Handle each menu option
             if user_choice == "1":
@@ -388,13 +390,17 @@ def main():
                 view_purchase_stats()
                 
             elif user_choice == "6":
+                # Admin panel
+                admin_panel(categories)
+                
+            elif user_choice == "7":
                 # Exit program
                 print("Thank you for using Bus Ticket System!")
                 break
                 
             else:
                 # Invalid choice
-                print("Invalid choice! Please enter 1-6.")
+                print("Invalid choice! Please enter 1-7.")
                 
         except KeyboardInterrupt:
             # User pressed Ctrl+C
